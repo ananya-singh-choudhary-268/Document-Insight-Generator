@@ -1,57 +1,75 @@
 # 🔍 Smart Document Insight Generator
 
-A full-stack **GenAI RAG platform** for extracting insights from semi-structured documents using multilingual OCR, vector search, and LLM-powered Q&A/summarization.
+**Live Deployment:** [https://document-insight-generator-lake.vercel.app/](https://document-insight-generator-lake.vercel.app/)
+
+A full-stack **GenAI platform** for extracting insights from semi-structured documents. It features multilingual OCR, FAISS vector search, LLM-powered Q&A/summarization, and an **Automated Answer Sheet Grading** pipeline.
 
 ## ✨ Features
 
-- **Multilingual OCR** — Extract text from PDFs, images (PNG, JPG, TIFF, BMP), and text files using Tesseract with 12+ language support
-- **FAISS Vector Search** — Documents are chunked, embedded, and indexed for fast semantic retrieval
-- **Q&A with RAG** — Ask natural language questions and get answers grounded in your documents with source references
-- **Document Summarization** — Generate concise AI-powered summaries of one or more documents
-- **Modern React UI** — Dark-themed glassmorphic interface with drag-and-drop upload, chat-style Q&A, and responsive design
+- **Automated Answer Sheet Grading (New)** — Upload a question paper and a student's answer sheet. The system extracts questions, identifies handwritten answer regions, maps them together using AI/fuzzy matching, and grades the answers using an LLM. Includes a visual viewer with color-coded bounding boxes.
+- **Multilingual OCR** — Extract text from PDFs, images (PNG, JPG, TIFF, BMP), and text files using Tesseract with 12+ language support and PyMuPDF.
+- **FAISS Vector Search** — Documents are chunked, embedded, and indexed for fast semantic retrieval.
+- **Q&A with RAG** — Ask natural language questions and get answers grounded in your documents with source references.
+- **Document Summarization** — Generate concise AI-powered summaries of one or more documents.
+- **Modern React UI** — Dark-themed glassmorphic interface with drag-and-drop upload, chat-style Q&A, answer sheet workspace, and responsive design.
 
 ## 🏗️ Tech Stack
 
 | Layer | Technology |
 |-------|-----------|
-| Frontend | React.js, Vite, React Router, Axios |
+| Frontend | React.js, Vite, React Router, Axios, CSS Modules |
 | Backend | FastAPI, Python, Uvicorn |
-| AI/ML | LangChain, OpenAI GPT, FAISS |
-| OCR | Tesseract (pytesseract) |
-| Data | PyPDF2, Pillow |
+| AI/ML | LangChain, OpenAI (GPT-4o-mini), FAISS |
+| OCR / Vision | Tesseract (pytesseract), PyMuPDF (fitz), Pillow, GPT-4o-mini (Vision) |
+| Matching | RapidFuzz, OpenAI Embeddings |
+| Deployment | Vercel (Frontend), Render/Railway (Backend Docker) |
 
 ## 📦 Project Structure
 
 ```
 ├── backend/
 │   ├── app/
-│   │   ├── main.py                 # FastAPI app entry point
-│   │   ├── config.py               # Environment-based configuration
-│   │   ├── models.py               # Pydantic request/response schemas
-│   │   ├── routers/                 # API route handlers
+│   │   ├── main.py                 # FastAPI app entry point (CORS + routing)
+│   │   ├── config.py               # Environment configuration
+│   │   ├── models.py               # Pydantic schemas (base)
+│   │   ├── evaluation_models.py    # Pydantic schemas for grading pipeline
+│   │   ├── routers/                # API route handlers
 │   │   │   ├── documents.py        # Upload, list, delete
 │   │   │   ├── query.py            # RAG Q&A
-│   │   │   └── summarize.py        # Document summarization
-│   │   └── services/               # Business logic
-│   │       ├── ocr.py              # Tesseract OCR pipeline
+│   │   │   ├── summarize.py        # Document summarization
+│   │   │   └── evaluation.py       # Answer sheet grading pipeline
+│   │   └── services/               # Core business logic
+│   │       ├── ocr.py              # Base Tesseract OCR
 │   │       ├── vectorstore.py      # FAISS index management
-│   │       ├── document_processor.py # Ingestion orchestrator
-│   │       └── rag.py              # LangChain RAG chains
-│   ├── requirements.txt
-│   └── .env.example
-└── frontend/
-    ├── src/
-    │   ├── App.jsx
-    │   ├── index.css                # Design system
-    │   ├── api/client.js            # API wrapper
-    │   └── components/
-    │       ├── Layout.jsx           # App shell + sidebar
-    │       ├── Dashboard.jsx        # Overview + stats
-    │       ├── DocumentUpload.jsx   # Drag-and-drop upload
-    │       ├── DocumentList.jsx     # Document management
-    │       ├── ChatInterface.jsx    # Q&A chat
-    │       └── SummaryView.jsx      # Summarization
-    └── package.json
+│   │       ├── document_processor.py
+│   │       ├── rag.py              # LangChain Q&A
+│   │       ├── evaluation_ingest.py # PDF/Image to Raster (PyMuPDF)
+│   │       ├── question_extractor.py # OCR + LLM Question parsing
+│   │       ├── answer_extractor.py # Vision LLM + Layout box parsing
+│   │       ├── mapper.py           # Fuzzy/Embedding Question→Answer mapping
+│   │       └── grader.py           # LLM answer evaluation
+│   ├── Dockerfile                  # Production Docker configuration
+│   └── requirements.txt
+├── frontend/
+│   ├── src/
+│   │   ├── App.jsx
+│   │   ├── index.css               # Design system & tokens
+│   │   ├── api/
+│   │   │   ├── client.js           # Base Axios client
+│   │   │   └── evaluationClient.js # Endpoints for grading
+│   │   └── components/
+│   │       ├── Layout.jsx          # App shell + sidebar
+│   │       ├── DocumentUpload.jsx  # Base document ingestion
+│   │       ├── ChatInterface.jsx   # RAG Q&A chat
+│   │       ├── EvaluationUpload.jsx# 2-slot drag & drop upload
+│   │       ├── EvaluationView.jsx  # Grading results workspace
+│   │       ├── QuestionListItem.jsx# Score badge & AI feedback row
+│   │       └── AnswerSheetViewer.jsx # Zoomable canvas with box overlay
+│   └── package.json
+├── render.yaml                     # IaC for Render deployment
+├── railway.json                    # IaC for Railway deployment
+├── vercel.json                     # IaC for Vercel deployment
+└── netlify.toml                    # IaC for Netlify deployment
 ```
 
 ## 🚀 Getting Started
@@ -89,6 +107,7 @@ npm run dev
 
 ## 🔌 API Endpoints
 
+### Documents & RAG
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | POST | `/api/documents/upload` | Upload a document for OCR + indexing |
@@ -97,12 +116,18 @@ npm run dev
 | DELETE | `/api/documents/{id}` | Delete document + vectors |
 | POST | `/api/query` | Ask a question (RAG) |
 | POST | `/api/summarize` | Summarize document(s) |
-| GET | `/api/health` | System health check |
 
-## 📸 Pages
+### Automated Evaluation (Grading)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/evaluation/upload` | Upload question paper + answer sheet |
+| GET | `/api/evaluation/{session_id}/status` | Check pipeline processing status |
+| GET | `/api/evaluation/{session_id}/questions`| Get extracted questions |
+| GET | `/api/evaluation/{session_id}/mapping`  | Get full grading results & mapping |
+| GET | `/api/evaluation/{session_id}/pages`    | Get answer sheet images |
 
-- **Dashboard** — Stats overview, quick actions, recent documents
-- **Upload** — Drag-and-drop with language selection and progress tracking
-- **Documents** — Searchable table with status, type, and delete actions
-- **Ask Questions** — Chat interface with document filtering and source references
-- **Summarize** — Multi-document selector with AI summary generation
+## 📸 Modules
+
+- **Dashboard** — Stats overview, quick actions, recent documents.
+- **Documents & Q&A** — Upload documents, manage your library, and chat with them using semantic RAG.
+- **Answer Sheet Evaluation (New)** — Upload a blank exam paper alongside a handwritten answer sheet. The system extracts questions, locates answers, maps them together, grades them using LLMs, and presents a visual workspace with score badges, AI feedback, and a zoomable bounding-box viewer.
