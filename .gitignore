@@ -1,49 +1,43 @@
-# ── Python ─────────────────────────────────────────────
+# ─── Python / venv ────────────────────────────────────────────────────────────
+venv/
 __pycache__/
 *.py[cod]
 *.pyo
-*.egg-info/
+*.pyd
+.Python
 *.egg
+*.egg-info/
 dist/
 build/
-*.whl
+.eggs/
+*.so
 
-# Virtual environment
-backend/venv/
-backend/.venv/
-venv/
-.venv/
+# ─── Runtime data (never commit) ──────────────────────────────────────────────
+uploads/
+faiss_index/
+*.tmp
+*.temp
 
-# Environment variables
+# ─── Environment / secrets ────────────────────────────────────────────────────
 .env
-.env.local
-.env.*.local
+# keep .env.example committed
 
-# ── Backend runtime data ───────────────────────────────
-backend/uploads/
-backend/faiss_index/
-
-# ── Node / Frontend ───────────────────────────────────
-node_modules/
-frontend/dist/
-frontend/build/
-*.tsbuildinfo
-
-# ── IDE / Editor ──────────────────────────────────────
+# ─── IDE / OS ─────────────────────────────────────────────────────────────────
+.DS_Store
 .vscode/
 .idea/
 *.swp
 *.swo
-*~
-.DS_Store
 Thumbs.db
 
-# ── Testing ───────────────────────────────────────────
+# ─── Frontend build artifacts ─────────────────────────────────────────────────
+frontend/node_modules/
+frontend/dist/
+
+# ─── Test cache ───────────────────────────────────────────────────────────────
 .pytest_cache/
 .coverage
 htmlcov/
-*.cover
 
-# ── Logs ──────────────────────────────────────────────
+# ─── Logs ─────────────────────────────────────────────────────────────────────
 *.log
-npm-debug.log*

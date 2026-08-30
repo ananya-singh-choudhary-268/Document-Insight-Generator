@@ -11,7 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
 from app.models import HealthResponse
 from app.services import document_processor, vectorstore, ocr
-from app.routers import documents, query, summarize
+from app.routers import documents, query, summarize, evaluation
 
 # Logging
 logging.basicConfig(
@@ -44,7 +44,7 @@ app = FastAPI(
 # CORS — allow the React dev server
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:3000", "http://127.0.0.1:5173"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -54,6 +54,7 @@ app.add_middleware(
 app.include_router(documents.router)
 app.include_router(query.router)
 app.include_router(summarize.router)
+app.include_router(evaluation.router)
 
 
 @app.get("/api/health", response_model=HealthResponse, tags=["Health"])

@@ -5,6 +5,8 @@ import DocumentUpload from './components/DocumentUpload';
 import DocumentList from './components/DocumentList';
 import ChatInterface from './components/ChatInterface';
 import SummaryView from './components/SummaryView';
+import EvaluationUpload from './components/EvaluationUpload';
+import EvaluationView from './components/EvaluationView';
 
 function App() {
   return (
@@ -15,6 +17,8 @@ function App() {
         <Route path="/documents" element={<DocumentList />} />
         <Route path="/query" element={<ChatInterface />} />
         <Route path="/summarize" element={<SummaryView />} />
+        <Route path="/evaluate" element={<EvaluationUpload />} />
+        <Route path="/evaluate/:sessionId" element={<EvaluationView />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Layout>

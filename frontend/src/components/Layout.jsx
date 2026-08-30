@@ -1,7 +1,7 @@
 import { NavLink, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { getHealth } from '../api/client';
-import { HiOutlineHome, HiOutlineCloudUpload, HiOutlineDocumentText, HiOutlineChatAlt2, HiOutlineSparkles } from 'react-icons/hi';
+import { HiOutlineHome, HiOutlineCloudUpload, HiOutlineDocumentText, HiOutlineChatAlt2, HiOutlineSparkles, HiOutlineAcademicCap } from 'react-icons/hi';
 
 const navItems = [
   { path: '/', label: 'Dashboard', icon: <HiOutlineHome /> },
@@ -9,6 +9,7 @@ const navItems = [
   { path: '/documents', label: 'My Documents', icon: <HiOutlineDocumentText /> },
   { path: '/query', label: 'Ask Questions', icon: <HiOutlineChatAlt2 /> },
   { path: '/summarize', label: 'Summarize', icon: <HiOutlineSparkles /> },
+  { path: '/evaluate', label: 'Grade Answer Sheet', icon: <HiOutlineAcademicCap /> },
 ];
 
 export default function Layout({ children }) {

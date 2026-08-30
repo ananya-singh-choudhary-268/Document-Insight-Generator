@@ -1,0 +1,46 @@
+# render.yaml — Infrastructure-as-Code for Render.com
+# Deploy: push repo to GitHub, then connect it in the Render dashboard.
+# Render reads this file and creates both services automatically.
+
+services:
+  # ── Backend ───────────────────────────────────────────────────────────────
+  - type: web
+    name: document-insight-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    region: oregon
+    plan: starter               # upgrade to standard for more RAM (OCR needs ~512 MB)
+    healthCheckPath: /api/health
+    envVars:
+      - key: OPENAI_API_KEY
+        sync: false             # set this secret in the Render dashboard
+      - key: OPENAI_MODEL
+        value: gpt-4o-mini
+      - key: UPLOAD_DIR
+        value: ./uploads
+      - key: FAISS_INDEX_DIR
+        value: ./faiss_index
+      - key: CHUNK_SIZE
+        value: "1000"
+      - key: CHUNK_OVERLAP
+        value: "200"
+      - key: TESSERACT_LANG
+        value: eng
+
+  # ── Frontend ──────────────────────────────────────────────────────────────
+  - type: web
+    name: document-insight-frontend
+    runtime: static
+    buildCommand: cd frontend && npm ci && npm run build
+    staticPublishPath: ./frontend/dist
+    region: oregon
+    plan: free
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html   # SPA fallback for React Router
+    envVars:
+      - key: VITE_API_URL
+        # Replace with your actual backend URL after first deploy
+        value: https://document-insight-backend.onrender.com/api
