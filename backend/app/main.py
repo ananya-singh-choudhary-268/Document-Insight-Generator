@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import logging
+import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
 
 from app.config import settings
 from app.models import HealthResponse
@@ -41,11 +43,20 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS — allow the React dev server
+# CORS
+# allow_origins=["*"] + allow_credentials=True is rejected by browsers.
+# We use wildcard for non-credentialed requests instead.
+# For credentialed requests from a specific frontend, set FRONTEND_URL env var.
+_frontend_url = os.getenv("FRONTEND_URL", "")
+_allow_origins = (
+    [_frontend_url, "http://localhost:5173", "http://localhost:3000"]
+    if _frontend_url
+    else ["*"]
+)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=_allow_origins,
+    allow_credentials=bool(_frontend_url),  # only True when explicit origin is set
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -55,6 +66,12 @@ app.include_router(documents.router)
 app.include_router(query.router)
 app.include_router(summarize.router)
 app.include_router(evaluation.router)
+
+
+@app.get("/", include_in_schema=False)
+async def root_redirect():
+    """Redirect bare root to the interactive API docs."""
+    return RedirectResponse(url="/docs")
 
 
 @app.get("/api/health", response_model=HealthResponse, tags=["Health"])
