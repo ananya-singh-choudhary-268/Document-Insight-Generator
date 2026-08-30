@@ -47,7 +47,7 @@ app = FastAPI(
 # allow_origins=["*"] + allow_credentials=True is rejected by browsers.
 # We use wildcard for non-credentialed requests instead.
 # For credentialed requests from a specific frontend, set FRONTEND_URL env var.
-_frontend_url = os.getenv("FRONTEND_URL", "")
+_frontend_url = os.getenv("FRONTEND_URL", "https://document-insight-generator-lake.vercel.app/")
 _allow_origins = (
     [_frontend_url, "http://localhost:5173", "http://localhost:3000"]
     if _frontend_url
